@@ -70,7 +70,7 @@ def preprocess(text,nlp):
     
     result = []
     
-    for token in gensim.utils.simple_preprocess(text): #  gensim.utils.simple_preprocess tokenizes el texto
+    for token in gensim.utils.simple_preprocess(text): #  gensim.utils.simple_preprocess tokenizer
         token = ''.join(x for x in token.lower() if x.isalpha())
         if token not in palabrasVacias_nltk and len(token) > 2:
             result.append(token)
