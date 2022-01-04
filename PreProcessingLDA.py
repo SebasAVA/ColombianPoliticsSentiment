@@ -16,6 +16,8 @@ import numpy as np
 import pandas as pd
 import language_tool_python
 
+np.random.seed(2022)
+
 corrector = language_tool_python.LanguageTool('es')
 
 nlp = spacy.load('es_core_news_lg')
@@ -60,6 +62,7 @@ tweets_sp = tweets_sp.rename(columns={0: 'tweet'})
 
 #Define functions to pre process the data lemmatize, remove url, 
 #Eliminar usted dentro de los stopwords
+#Revisar sinonimos
 palabrasVacias_nltk = stopwords.words('spanish')
 palabrasVacias_nltk.append("usted")
 palabrasVacias_nltk.append("hacer")
@@ -132,15 +135,20 @@ for k, v in dictionary_spanish.iteritems():
     
 #Distribucion de las palabras para resolver el cutter  
 #########################  
-dictionary_spanish.most_common()[:10]
-dictionary_spanish.most_common()[-10:]
+
 dictionary_spanish.filter_extremes(no_below=10, no_above=0.5, keep_n=100000)
 dictionary_spanish.most_common()[:10]
 dictionary_spanish.most_common()[-10:]
+# assume the word 'b' is to be deleted, put its id in a variable
+
+words_to_del = ['ver','mas','cómo','así','cuál','tal','dejar','jajajajajaja','jajajajaja','hacer','afinia','decir','ser','ir','señor','salir','jajajaja','asi','bla','jajajajajajaja','siguemeytesigo','siganme','síganme']
+
+for i in words_to_del:
+    del_ids = [k for k,v in dictionary_spanish.items() if v==i]
+    dictionary_spanish.filter_tokens(bad_ids=del_ids)
 
 
 bow_corpus = [dictionary_spanish.doc2bow(doc) for doc in preprocessed_tweets]
-
 
 
 #EJEMPLO BOW
@@ -162,16 +170,22 @@ bow_doc_4310[i][1]))
 from gensim import models
 tfidf = models.TfidfModel(bow_corpus)
 corpus_tfidf = tfidf[bow_corpus]
-
+"""
 print(preprocessed_tweets[0],'\n')
 print(bow_corpus[0],'\n')
 from pprint import pprint
 for doc in corpus_tfidf:
     pprint(doc)
     break
+"""
 
-lda_model_tfidf = gensim.models.LdaMulticore(corpus_tfidf, num_topics=5, id2word=dictionary_spanish, passes=4, workers=8)
+##MODEL
 
+lda_model_tfidf = gensim.models.LdaMulticore(corpus_tfidf, num_topics=16, id2word=dictionary_spanish, 
+                                             random_state=100,
+                                             passes=10,
+                                             workers=8)
+topics = lda_model_tfidf.show_topics()
 
 for idx, topic in lda_model_tfidf.print_topics(-1):
     print('Topic: {} Word: {}'.format(idx, topic[:200]))
@@ -192,7 +206,7 @@ for index, score in sorted(lda_model_tfidf[tfidf_vector], key=lambda tup: -1*tup
     
     
     
-unseen_document = 'Seguridad .'
+unseen_document = 'Situacion politica corrupcion .'
 
 print(f'\nOriginal Document:')
 print(unseen_document,'\n')
@@ -202,7 +216,11 @@ tfidf_vector = tfidf[bow_vector]
 for index, score in sorted(lda_model_tfidf[tfidf_vector], key=lambda tup: -1*tup[1]):
     print("Score: {}\t Topic: {}".format(score, lda_model_tfidf.print_topic(index, 5)))
     
+ 
     
+ 
+    
+ 
 #COHERENCE
 from gensim.models import CoherenceModel
 # Compute Coherence Score
