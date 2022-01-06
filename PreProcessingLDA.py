@@ -65,6 +65,7 @@ tweets_sp = tweets_sp.rename(columns={0: 'tweet'})
 #Revisar sinonimos
 palabrasVacias_nltk = stopwords.words('spanish')
 palabrasVacias_nltk.append("usted")
+palabrasVacias_nltk.append("uds")
 palabrasVacias_nltk.append("hacer")
 palabrasVacias_nltk.append("bien")
 palabrasVacias_nltk.append("navidad")
@@ -236,7 +237,8 @@ def compute_coherence_values(corpus, dictionary, k):
                                            id2word=dictionary,
                                            num_topics=k, 
                                            random_state=100,
-                                           passes=10,
+                                           iterations = 400,
+                                           passes=40,
                                            workers=8)
     
     coherence_model_lda = CoherenceModel(model=lda_model, texts=preprocessed_tweets, dictionary=dictionary_spanish, coherence='c_v')
