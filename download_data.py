@@ -59,23 +59,34 @@ try:
         print("database connected")
 
         # curs.execute("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'tweet'")
-        columns_name = ['id','label']
-        curs.execute("SELECT twitter_id,full_text FROM tweet WHERE in_reply_twitter_id IS NULL") 
-        content = castData(curs)
-        toCSV('data/politicians_tweets.csv',columns_name,content)
+        # print("\nDownload politicians tweets")
+        # columns_name = ['twitter_id','id','label']
+        # curs.execute("SELECT twitter_id,id,full_text FROM tweet WHERE in_reply_twitter_id IS NULL")
+        # content = castData(curs)
+        # toCSV('data/politicians_tweets.csv',columns_name,content)
+        #
+        # print("\nDownload reply tweets")
+        # curs.execute("SELECT twitter_id,full_text FROM tweet WHERE in_reply_twitter_id IS NOT NULL")
+        # content = castData(curs)
+        # toCSV('data/reply_tweets.csv',columns_name,content)
+        #
+        # print("\nDownload all tweets")
+        # columns_name = columns_name = ['twitter_id','id','label']
+        # curs.execute("SELECT twitter_id,id,full_text FROM tweet")
+        # content = castData(curs)
+        # toCSV('data/tweets.csv', columns_name, content)
+        #
+        # print("\nDownload edges")
+        # columns_name = ['source','target']
+        # curs.execute("SELECT twitter_id,in_reply_twitter_id FROM tweet WHERE in_reply_twitter_id IS NOT NULL")
+        # content = castData(curs)
+        # toCSV('data/edges.csv',columns_name,content)
 
-        curs.execute("SELECT twitter_id,full_text FROM tweet WHERE in_reply_twitter_id IS NOT NULL") 
+        print("\nDownload topics")
+        columns_name = ['id','topic', 'score']
+        curs.execute("SELECT id_tweet,id_topic,score FROM tweet_topic")
         content = castData(curs)
-        toCSV('data/reply_tweets.csv',columns_name,content)
-
-        curs.execute("SELECT twitter_id,full_text FROM tweet")
-        content = castData(curs)
-        toCSV('data/tweets.csv', columns_name, content)
-
-        columns_name = ['source','target']
-        curs.execute("SELECT twitter_id,in_reply_twitter_id FROM tweet WHERE in_reply_twitter_id IS NOT NULL")
-        content = castData(curs)
-        toCSV('data/edges.csv',columns_name,content)
+        toCSV('data/tweet_topic.csv',columns_name,content)
 
 except (Exception) as error:
     print("Connection Failed")
