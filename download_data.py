@@ -88,6 +88,12 @@ try:
         content = castData(curs)
         toCSV('data/tweet_topic.csv',columns_name,content)
 
+        print("\nDownload topic dictionary")
+        columns_name = ['id_topic','label']
+        curs.execute("SELECT * FROM topic")
+        content = castData(curs)
+        toCSV('data/topic_dictionary.csv',columns_name,content)
+
 except (Exception) as error:
     print("Connection Failed")
     print(error)
